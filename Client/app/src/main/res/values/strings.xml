@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Account operations</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_registration">Registration</string>
+
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="name">Name</string>
+    <string name="title_activity_login">Login</string>
+    <string name="registration">Registration</string>
+    <string name="login">Login</string>
+    <string name="surname">Surname</string>
+    <string name="graduated_from">Graduated from</string>
+    <string name="graduated_in">Graduated in</string>
+    <string name="born_place">Born place</string>
+    <string name="birthday">Birthday</string>
+    <string name="submit">Submit</string>
+    <string name="clear">Clear</string>
+    <string name="profile_pic">Pick image</string>
+    <string name="contentDescription">Set profile picture</string>
+    <string name="title_activity_profile">Profile</string>
+    <string name="update">Update</string>
+</resources>
