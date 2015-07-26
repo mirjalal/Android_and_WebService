@@ -18,16 +18,16 @@ try {
         $_graduated_in = isset($_REQUEST['_graduated_in']) ? $_REQUEST['_graduated_in'] : '';
         $_born_place = isset($_REQUEST['_born_place']) ? $_REQUEST['_born_place'] : '';
         $_birthday = isset($_REQUEST['_birthday']) ? $_REQUEST['_birthday'] : '';
-        $_profile_pic = isset($_REQUEST['filename']) ? $_REQUEST['filename'] : '';
+    //    $_profile_pic = isset($_REQUEST['file_name_and_dir']) ? $_REQUEST['file_name_and_dir'] : '';
 
         $_image = $_REQUEST['image'];
         $binary = base64_decode($_image);
-        header('Content-Type: bitmap; charset=utf-8');
-        $file = fopen('uploadedimages/' . $_profile_pic, 'wb');
-        fwrite($file, $binary);
-        fclose($file);
+//        header('Content-Type: bitmap; charset=utf-8');
+//        $file = fopen('uploadedimages/' . $_profile_pic, 'wb');
+//        fwrite($file, $binary);
+//        fclose($file);
 
-        $sql = "INSERT INTO users (`_username`,`_password`,`_name`,`_surname`,`_graduated_from`,`_graduated_in`,`_born_place`,`_birthday`,`_profile_pic`) VALUES ('$_username', '$_password', '$_name', '$_surname', '$_graduated_from', '$_graduated_in', '$_born_place', '$_birthday', '$_profile_pic')";
+        $sql = "INSERT INTO users (`_username`,`_password`,`_name`,`_surname`,`_graduated_from`,`_graduated_in`,`_born_place`,`_birthday`,`_profile_pic`) VALUES ('$_username', '$_password', '$_name', '$_surname', '$_graduated_from', '$_graduated_in', '$_born_place', '$_birthday', '$_image')";
         // use exec() because no results are returned
         $connect->query($sql);
 
@@ -35,7 +35,7 @@ try {
 
         $connect = null;
     } catch (\Exception $e) {
-        print "";
+        print $e->getMessage();
     }
 } catch (\PDOException $e) {
     print "Connection error: Couldn't connect to server.\nPlease try again later.";

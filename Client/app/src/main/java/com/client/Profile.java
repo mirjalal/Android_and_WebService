@@ -2,14 +2,18 @@ package com.client;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
+import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -17,8 +21,9 @@ import java.util.Calendar;
 public class Profile extends ActionBarActivity {
     int gun, ay, il;
     Button update, clear;
-    TextView profile_pic, birthday;
+    TextView birthday;
     EditText name, surname, graduated_from, graduated_in, born_place;
+    ImageView _picture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,12 +31,13 @@ public class Profile extends ActionBarActivity {
         setContentView(R.layout.activity_profile);
 
         int id;
-        String name_value = "";
-        String surname_value = "";
-        String graduated_from_value = "";
-        String graduated_in_value = "";
-        String born_place_value = "";
-        String birthday_value = "";
+        String name_value;
+        String surname_value;
+        String graduated_from_value;
+        String graduated_in_value;
+        String born_place_value;
+        String birthday_value;
+        String profile_pic_value;
 
         /***************** get values from view elements ******************/
         update = (Button) findViewById(R.id.update);
@@ -42,6 +48,7 @@ public class Profile extends ActionBarActivity {
         graduated_in = (EditText) findViewById(R.id.profile_graduated_in);
         born_place = (EditText) findViewById(R.id.profile_born_place);
         birthday = (TextView) findViewById(R.id.profile_birthday);
+        _picture = (ImageView) findViewById(R.id.profile_imageView);
         /***************** get values from view elements ******************/
 
         Bundle extras = getIntent().getExtras();
@@ -53,6 +60,7 @@ public class Profile extends ActionBarActivity {
             graduated_in_value = extras.getString("_graduated_in");
             born_place_value = extras.getString("_born_place");
             birthday_value = extras.getString("_birthday");
+            profile_pic_value = extras.getString("_picture");
 
             /***************** set values to view elements ******************/
             name.setText(name_value.trim());
@@ -61,6 +69,16 @@ public class Profile extends ActionBarActivity {
             graduated_in.setText(graduated_in_value.trim());
             born_place.setText(born_place_value.trim());
             birthday.setText(birthday_value.trim());
+
+
+            byte[] decodedByte = Base64.decode(profile_pic_value, Base64.DEFAULT);
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = false;
+            options.inPreferredConfig = Bitmap.Config.RGB_565;
+//            return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length, options);
+//            byte[] decodedString = Base64.decode(profile_pic_value, Base64.DEFAULT);
+            Bitmap bmp = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length, options);
+            _picture.setImageBitmap(bmp);
             /***************** set values to view elements ******************/
         }
 
@@ -75,9 +93,7 @@ public class Profile extends ActionBarActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.ECLAIR
-                && keyCode == KeyEvent.KEYCODE_BACK
-                && event.getRepeatCount() == 0) {
+        if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.ECLAIR && keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
 
             AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
             alertbox.setTitle("Message");

@@ -32,6 +32,12 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Calendar;
 
 import static android.content.Intent.ACTION_GET_CONTENT;
@@ -53,7 +59,7 @@ public class Registration extends ActionBarActivity {
     ImageView imageview;
     ProgressDialog prgDialog;
     RequestParams params = new RequestParams();
-    String _username, _password, _name, _surname, _graduated_from, _graduated_in, _born_place, _birthday, imgPath, fileName, encodedString;
+    String _username, _password, _name, _surname, _graduated_from, _graduated_in, _born_place, _birthday, imgPath, encodedString;
     Bitmap bitmap;
     private DatePickerDialog.OnDateSetListener datepickerlistener = new DatePickerDialog.OnDateSetListener() {
         @Override
@@ -155,7 +161,7 @@ public class Registration extends ActionBarActivity {
         profile_pic.setOnClickListener(button_click);
     }
 
-    private void postData() {
+    void postData() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
 
@@ -166,8 +172,6 @@ public class Registration extends ActionBarActivity {
 
                 }
 
-                ;
-
                 @Override
                 protected String doInBackground(Void... params) {
                     BitmapFactory.Options options = null;
@@ -177,7 +181,7 @@ public class Registration extends ActionBarActivity {
                             options);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     // Must compress the Image to reduce image size to make upload easy
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 500, stream);
                     byte[] byte_arr = stream.toByteArray();
                     // Encode Image to String
                     encodedString = Base64.encodeToString(byte_arr, 0);
@@ -197,7 +201,6 @@ public class Registration extends ActionBarActivity {
                     params.put("_graduated_in", _graduated_in);
                     params.put("_born_place", _born_place);
                     params.put("_birthday", _birthday);
-                    params.put("fileName", fileName);
                     params.put("image", encodedString);
                     // Trigger Image upload
                     makeHTTPCall();
@@ -209,10 +212,10 @@ public class Registration extends ActionBarActivity {
 
     // Make Http call to upload Image to Php server
     public void makeHTTPCall() {
-        prgDialog.setMessage("Calling WebService");
+        prgDialog.setMessage("Collecting data...");
         AsyncHttpClient client = new AsyncHttpClient();
         // Don't forget to change the IP address to your LAN address. Port no as well.
-        client.post("http://192.168.0.100:81/Android_and_WebService/WebService/dbMethods/insert.php",
+        client.post("http://192.168.0.100:81/Android_and_WebService/WebService/dbMethods/registration.php",
                 params, new AsyncHttpResponseHandler() {
                     // When the response returned by REST has Http
                     // response code '200'
@@ -259,7 +262,7 @@ public class Registration extends ActionBarActivity {
     /**
      * ************** clear form *****************
      */
-    private void clearForm(ViewGroup group) {
+    void clearForm(ViewGroup group) {
         for (int i = 0, count = group.getChildCount(); i < count; ++i) {
             if (group.getChildAt(i) instanceof EditText)
                 ((EditText) group.getChildAt(i)).setText("");
@@ -271,13 +274,12 @@ public class Registration extends ActionBarActivity {
         birthday.setText("Birthday");
         profile_pic.setText("Pick image");
     }
-
     /**
      * ************** clear form *****************
      */
 
 
-    private void getImage() {
+    void getImage() {
         Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); // for Camera app
         Intent getIntent = new Intent(ACTION_GET_CONTENT); // for other image base apps (locations)
         getIntent.setType("image/*");
@@ -290,20 +292,34 @@ public class Registration extends ActionBarActivity {
     }
 
 
-    // When Image is selected from Gallery
+    String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    // When image is selected
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         try {
-            // When an Image is picked
+            // if an image picked
             if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK && null != data) {
-                // Get the Image from data
+                // Get the image from data
                 Uri selectedImage = data.getData();
                 String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
-                // Get the cursor
-                Cursor cursor = getContentResolver().query(selectedImage,
-                        filePathColumn, null, null, null);
+                // Get cursor
+                Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
                 // Move to first row
                 cursor.moveToFirst();
 
@@ -311,19 +327,56 @@ public class Registration extends ActionBarActivity {
                 imgPath = cursor.getString(columnIndex);
                 cursor.close();
                 ImageView imgView = (ImageView) findViewById(R.id.imageView);
-                // Set the Image in ImageView
-                imgView.setImageBitmap(BitmapFactory
-                        .decodeFile(imgPath));
-                // Get the Image's file name
-                String fileNameSegments[] = imgPath.split("/");
-                fileName = fileNameSegments[fileNameSegments.length - 1];
+                // Set the image
+                imgView.setImageBitmap(BitmapFactory.decodeFile(imgPath));
+
+                String selectedImagePath = getRealPathFromURI(imageview.getContext(), selectedImage);
+                File getImageName = new File(selectedImage.toString());
+//                copyFile(new File(selectedImagePath), getImageName.toString());
+                selectedImagePath = getImageName.toString();
+
                 // Put file name in Async Http Post Param which will used in Php web app
-                params.put("filename", fileName);
+                params.put("file_name_and_dir", selectedImagePath);
             } else {
                 Toast.makeText(this, "You haven't picked Image", LENGTH_LONG).show();
             }
         } catch (Exception e) {
             Toast.makeText(this, "Something went wrong", LENGTH_LONG).show();
+        }
+    }
+
+
+    private void copyFile(File sourceLocation, String fileName) throws IOException {
+        File targetLocation = new File("/storage/emulated/0/Account operations/file.jpg");
+
+        if (sourceLocation.isDirectory()) {
+            if (!targetLocation.exists() && !targetLocation.mkdirs()) {
+                //throw new IOException("Cannot create dir " + targetLocation.getAbsolutePath());
+                Toast.makeText(getApplicationContext(), "Cannot create dir " + targetLocation.getAbsolutePath(), LENGTH_LONG).show();
+            }
+
+            String[] children = sourceLocation.list();
+            for (String aChildren : children)
+                copyFile(new File(sourceLocation, aChildren), fileName);
+        } else {
+            // make sure the directory we plan to store the recording in exists
+            File directory = targetLocation.getParentFile();
+            if (directory != null && !directory.exists() && !directory.mkdirs()) {
+//                throw new IOException("Cannot create dir " + directory.getAbsolutePath());
+                Toast.makeText(getApplicationContext(), "Cannot create dir " + directory.getAbsolutePath(), LENGTH_LONG).show();
+            }
+
+            InputStream in = new FileInputStream(sourceLocation);
+            OutputStream out = new FileOutputStream(targetLocation);
+
+            // Copy the bits from instream to outstream
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            in.close();
+            out.close();
         }
     }
 
