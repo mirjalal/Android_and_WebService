@@ -31,6 +31,8 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.apache.http.Header;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,6 +40,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Calendar;
 
 import static android.content.Intent.ACTION_GET_CONTENT;
@@ -174,14 +177,13 @@ public class Registration extends ActionBarActivity {
 
                 @Override
                 protected String doInBackground(Void... params) {
-                    BitmapFactory.Options options = null;
+                    BitmapFactory.Options options;
                     options = new BitmapFactory.Options();
                     options.inSampleSize = 3;
-                    bitmap = BitmapFactory.decodeFile(imgPath,
-                            options);
+                    bitmap = BitmapFactory.decodeFile(imgPath, options);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     // Must compress the Image to reduce image size to make upload easy
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 500, stream);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                     byte[] byte_arr = stream.toByteArray();
                     // Encode Image to String
                     encodedString = Base64.encodeToString(byte_arr, 0);
@@ -215,34 +217,17 @@ public class Registration extends ActionBarActivity {
         prgDialog.setMessage("Collecting data...");
         AsyncHttpClient client = new AsyncHttpClient();
         // Don't forget to change the IP address to your LAN address. Port no as well.
-        client.post("http://192.168.0.100:81/Android_and_WebService/WebService/dbMethods/registration.php",
+        client.post("http://45.35.4.29:81/Android_and_WebService/WebService/dbMethods/registration.php",
                 params, new AsyncHttpResponseHandler() {
-                    // When the response returned by REST has Http
-                    // response code '200'
                     @Override
-                    public void onSuccess(String response) {
-                        // Hide Progress Dialog
+                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                         prgDialog.hide();
-                        Toast.makeText(getApplicationContext(), response, LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), Arrays.toString(responseBody), LENGTH_LONG).show();
                     }
 
-                    // When the response returned by REST has Http
-                    // response code other than '200' such as '404',
-                    // '500' or '403' etc
                     @Override
-                    public void onFailure(int statusCode, Throwable error,
-                                          String content) {
-                        // Hide Progress Dialog
-                        prgDialog.hide();
-                        // When Http response code is '404'
-                        if (statusCode == 404)
-                            Toast.makeText(getApplicationContext(), "Requested resource not found", LENGTH_LONG).show();
-                            // When Http response code is '500'
-                        else if (statusCode == 500)
-                            Toast.makeText(getApplicationContext(), "Something went wrong at server end", LENGTH_LONG).show();
-                            // When Http response code other than 404, 500
-                        else
-                            Toast.makeText(getApplicationContext(), "Error occured\nMost common errors:\n1. Device not connected to Internet\n2. Web App is not deployed in App server\n3. App server is not running\nHTTP Status code: " + statusCode, LENGTH_LONG).show();
+                    public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                        Toast.makeText(getApplicationContext(), "Something went wrong. Please try again later.", LENGTH_LONG).show();
                     }
                 });
     }
@@ -274,6 +259,7 @@ public class Registration extends ActionBarActivity {
         birthday.setText("Birthday");
         profile_pic.setText("Pick image");
     }
+
     /**
      * ************** clear form *****************
      */
