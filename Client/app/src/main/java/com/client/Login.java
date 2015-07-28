@@ -4,13 +4,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -26,11 +26,16 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
-import org.apache.http.Header;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Arrays;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.ByteBuffer;
 
 import static android.widget.Toast.LENGTH_LONG;
 
@@ -96,14 +101,14 @@ public class Login extends ActionBarActivity {
         if (netInfo != null && netInfo.isConnectedOrConnecting()) {
             try {
                 new AsyncTask<Void, Void, String>() {
-                    //  ProgressDialog progressDialog = new ProgressDialog(Login.this);
+                    ProgressDialog progressDialog = new ProgressDialog(Login.this);
 
                     @Override
                     protected void onPreExecute() {
-                        prgDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                             public void onCancel(DialogInterface arg0) {
                                 prgDialog.cancel();
-//                                prgDialog.dismiss();
+                                prgDialog.dismiss();
                                 prgDialog.hide();
                             }
                         });
@@ -119,9 +124,6 @@ public class Login extends ActionBarActivity {
 
                     @Override
                     protected void onPostExecute(String v) {
-                        prgDialog.setMessage("Getting data...");
-                        prgDialog.show();
-
                         params.put("_username", _username);
                         params.put("_password", _password);
 
@@ -131,41 +133,20 @@ public class Login extends ActionBarActivity {
             } catch (Exception e) {
                 Log.e("ERRROORRR: ", e.toString());
             }
-        } else {
-            Toast.makeText(getApplicationContext(), "Can't connect right now.", LENGTH_LONG).show();
-
-            AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-            alertDialog.setMessage("Device is not connected to internet. Do you want to open Settings?").setTitle("Info");
-            alertDialog.setIcon(android.R.drawable.ic_dialog_alert);
-            alertDialog.setInverseBackgroundForced(false);
-
-            alertDialog.setPositiveButton("Yes",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface arg0, int arg1) {
-                            Intent settingsIntent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
-                            startActivity(settingsIntent);
-                        }
-                    });
-
-            alertDialog.setNegativeButton("No",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface arg0, int arg1) {
-                        }
-                    });
-
-            alertDialog.show();
-        }
+        } else
+            Toast.makeText(getApplicationContext(), "Device is not connected to network", LENGTH_LONG).show();
     }
-
 
     private void callService() {
         AsyncHttpClient client = new AsyncHttpClient();
         // Don't forget to change the IP address to your LAN address. Port no as well.
-        client.get("http://45.35.4.29:81/Android_and_WebService/WebService/dbMethods/login.php",
+        client.post("http://192.168.0.100:81/Android_and_WebService/WebService/dbMethods/login.php",
                 params, new AsyncHttpResponseHandler() {
+                    // When the response returned by REST has Http
+                    // response code '200'
                     @Override
-                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        if (!Arrays.toString(responseBody).equals("Username or password is incorrect")) {
+                    public void onSuccess(String response) {
+                        if (!response.equals("Username or password is incorrect")) {
                             int json_id;
                             String json_name;
                             String json_surname;
@@ -179,47 +160,69 @@ public class Login extends ActionBarActivity {
 
                             //parse JSON data
                             try {
-                                JSONArray jsonArray = new JSONArray(Arrays.toString(responseBody));
-                                if (jsonArray.length() != 0) {
-                                    prgDialog.setMessage("Getting data...");
-                                    prgDialog.show();
+                                JSONArray jsonArray = new JSONArray(response);
+                            if (jsonArray.length() != 0) {
+                                prgDialog.setMessage("Getting data...");
+                                prgDialog.show();
 
-                                    JSONObject jsonObject = jsonArray.getJSONObject(0);
-                                    json_id = jsonObject.getInt("_id");
-                                    json_name = jsonObject.getString("_name");
-                                    json_surname = jsonObject.getString("_surname");
-                                    json_graduated_from = jsonObject.getString("_graduated_from");
-                                    json_graduated_in = jsonObject.getString("_graduated_in");
-                                    json_born_place = jsonObject.getString("_born_place");
-                                    json_birthday = jsonObject.getString("_birthday");
-                                    json_picture = jsonObject.getString("_profile_pic");
+                                JSONObject jsonObject = jsonArray.getJSONObject(0);
+                                json_id = jsonObject.getInt("_id");
+                                json_name = jsonObject.getString("_name");
+                                json_surname = jsonObject.getString("_surname");
+                                json_graduated_from = jsonObject.getString("_graduated_from");
+                                json_graduated_in = jsonObject.getString("_graduated_in");
+                                json_born_place = jsonObject.getString("_born_place");
+                                json_birthday = jsonObject.getString("_birthday");
+                                json_picture = jsonObject.getString("_profile_pic");
 
-                                    Intent intent = new Intent(getBaseContext(), Profile.class);
-                                    /********** set extra values to send them to Profile activity **********/
-                                    intent.putExtra("_id", json_id);
-                                    intent.putExtra("_name", json_name);
-                                    intent.putExtra("_surname", json_surname);
-                                    intent.putExtra("_graduated_from", json_graduated_from);
-                                    intent.putExtra("_graduated_in", json_graduated_in);
-                                    intent.putExtra("_born_place", json_born_place);
-                                    intent.putExtra("_birthday", json_birthday);
-                                    intent.putExtra("_picture", json_picture);
-                                    /********** set extra values to send them to Profile activity **********/
-                                    startActivity(intent);
-                                } else {
-                                    Toast.makeText(getApplicationContext(), "Username or password is incorrect", LENGTH_LONG).show();
-                                }
+//                                Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL("http://localhost:81/Android_and_WebService/WebService/dbMethods/login.php").getContent());
+//                                int bytes = bitmap.getByteCount();
+//                                //or we can calculate bytes this way. Use a different value than 4 if you don't use 32bit images.
+//                                //int bytes = b.getWidth()*b.getHeight()*4;
+//                                ByteBuffer buffer = ByteBuffer.allocate(bytes); //Create a new buffer
+//                                bitmap.copyPixelsToBuffer(buffer); //Move the byte data to the buffer
+//
+//                                byte[] array = buffer.array(); //Get the underlying array containing the data.
+                                Intent intent = new Intent(getBaseContext(), Profile.class);
+                                /********** set extra values to send them to Profile activity **********/
+                                intent.putExtra("_id", json_id);
+                                intent.putExtra("_name", json_name);
+                                intent.putExtra("_surname", json_surname);
+                                intent.putExtra("_graduated_from", json_graduated_from);
+                                intent.putExtra("_graduated_in", json_graduated_in);
+                                intent.putExtra("_born_place", json_born_place);
+                                intent.putExtra("_birthday", json_birthday);
+                                intent.putExtra("_picture", json_picture);
+                                /********** set extra values to send them to Profile activity **********/
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Username or password is incorrect", LENGTH_LONG).show();
+                            }
                             } catch (Exception e) {
+                                //e.printStackTrace();
                                 Toast.makeText(getApplicationContext(), "Something went wrong. Please try again later.", LENGTH_LONG).show();
+
                                 Log.w("Picture error; ", e.toString());
                             }
                         } else
-                            Toast.makeText(getApplicationContext(), Arrays.toString(responseBody), LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), response, LENGTH_LONG).show();
                     }
-
+                    // When the response returned by REST has Http
+                    // response code other than '200' such as '404',
+                    // '500' or '403' etc
                     @Override
-                    public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                        Toast.makeText(getApplicationContext(), "Something went wrong. Please try again later.", LENGTH_LONG).show();
+                    public void onFailure(int statusCode, Throwable error, String content) {
+                        // Hide Progress Dialog
+                        prgDialog.cancel();
+                        // When Http response code is '404'
+                        if (statusCode == 404)
+                            Toast.makeText(getApplicationContext(), "Requested resource not found", LENGTH_LONG).show();
+                            // When Http response code is '500'
+                        else if (statusCode == 500)
+                            Toast.makeText(getApplicationContext(), "Something went wrong. Please try again later.", LENGTH_LONG).show();
+                            // When Http response code other than 404, 500
+                        else
+                            Toast.makeText(getApplicationContext(), "Something went wrong. Please try again later.", LENGTH_LONG).show();
                     }
                 });
     }

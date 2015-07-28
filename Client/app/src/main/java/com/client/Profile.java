@@ -96,7 +96,7 @@ public class Profile extends ActionBarActivity {
         if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.ECLAIR && keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
 
             AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
-            alertbox.setTitle("Info");
+            alertbox.setTitle("Message");
             alertbox.setMessage("Do you want to quit?");
 
             alertbox.setPositiveButton("Yes",
@@ -108,7 +108,7 @@ public class Profile extends ActionBarActivity {
                         }
                     });
 
-            alertbox.setNegativeButton("No",
+            alertbox.setNeutralButton("No",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface arg0, int arg1) {
                         }
