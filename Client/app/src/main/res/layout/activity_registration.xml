@@ -129,7 +129,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
-                android:id="@+id/profile_pic"
+                android:id="@+id/pick_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/margin_top"
@@ -139,7 +139,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/profile_pic"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/margin_top"

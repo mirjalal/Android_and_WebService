@@ -110,14 +110,21 @@
                 android:text="@string/profile_pic"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <ImageView
+            <com.loopj.android.image.SmartImageView
                 android:id="@+id/profile_imageView"
-                android:layout_width="fill_parent"
-                android:layout_height="550dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/margin_top"
-                android:layout_marginTop="@dimen/margin_top"
-                android:contentDescription="@string/contentDescription"
-                android:scaleType="fitXY" />
+                android:layout_marginTop="@dimen/margin_top" />
+
+            <!--<ImageView-->
+            <!--android:id="@+id/profile_imageView"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="550dp"-->
+            <!--android:layout_marginBottom="@dimen/margin_top"-->
+            <!--android:layout_marginTop="@dimen/margin_top"-->
+            <!--android:contentDescription="@string/contentDescription"-->
+            <!--android:scaleType="fitXY" />-->
 
             <Button
                 android:id="@+id/update"

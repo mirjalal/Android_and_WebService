@@ -16,6 +16,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.loopj.android.image.SmartImageView;
+
 import java.util.Calendar;
 
 public class Profile extends ActionBarActivity {
@@ -23,7 +25,7 @@ public class Profile extends ActionBarActivity {
     Button update, clear;
     TextView birthday;
     EditText name, surname, graduated_from, graduated_in, born_place;
-    ImageView _picture;
+    SmartImageView _profile_pic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +39,9 @@ public class Profile extends ActionBarActivity {
         String graduated_in_value;
         String born_place_value;
         String birthday_value;
-        String profile_pic_value;
+        String profile_pic;
 
-        /***************** get values from view elements ******************/
+        // get values from view elements
         update = (Button) findViewById(R.id.update);
         clear = (Button) findViewById(R.id.clear);
         name = (EditText) findViewById(R.id.profile_name);
@@ -48,8 +50,7 @@ public class Profile extends ActionBarActivity {
         graduated_in = (EditText) findViewById(R.id.profile_graduated_in);
         born_place = (EditText) findViewById(R.id.profile_born_place);
         birthday = (TextView) findViewById(R.id.profile_birthday);
-        _picture = (ImageView) findViewById(R.id.profile_imageView);
-        /***************** get values from view elements ******************/
+        _profile_pic = (SmartImageView) this.findViewById(R.id.profile_imageView);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -60,7 +61,7 @@ public class Profile extends ActionBarActivity {
             graduated_in_value = extras.getString("_graduated_in");
             born_place_value = extras.getString("_born_place");
             birthday_value = extras.getString("_birthday");
-//            profile_pic_value = extras.getString("_picture");
+            profile_pic = extras.getString("_picture");
 
             /***************** set values to view elements ******************/
             name.setText(name_value.trim());
@@ -69,26 +70,15 @@ public class Profile extends ActionBarActivity {
             graduated_in.setText(graduated_in_value.trim());
             born_place.setText(born_place_value.trim());
             birthday.setText(birthday_value.trim());
-
-
-//            byte[] decodedByte = Base64.decode(profile_pic_value, Base64.DEFAULT);
-//            final BitmapFactory.Options options = new BitmapFactory.Options();
-//            options.inJustDecodeBounds = false;
-//            options.inPreferredConfig = Bitmap.Config.RGB_565;
-////            return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length, options);
-////            byte[] decodedString = Base64.decode(profile_pic_value, Base64.DEFAULT);
-//            Bitmap bmp = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length, options);
-//            _picture.setImageBitmap(bmp);
-            /***************** set values to view elements ******************/
+            _profile_pic.setImageUrl("http://dailydropcap.com/images/H-11.jpg");
         }
 
-        /***************** set calendar to current date ******************/
+        // set calendar to current date
         final Calendar calendar = Calendar.getInstance();
         gun = calendar.get(Calendar.DATE);
         ay = calendar.get(Calendar.MONTH);
         il = calendar.get(Calendar.YEAR);
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
-        /***************** set calendar to current date ******************/
     }
 
     @Override

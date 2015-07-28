@@ -26,5 +26,5 @@ proguard/
 *.log
 
 .idea/
-uploadedimages/
+uploads/
 androidtest/
