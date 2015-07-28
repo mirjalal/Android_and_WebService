@@ -217,16 +217,19 @@ public class Registration extends ActionBarActivity {
         prgDialog.setMessage("Collecting data...");
         AsyncHttpClient client = new AsyncHttpClient();
         // Don't forget to change the IP address to your LAN address. Port no as well.
-        client.post("http://45.35.4.29:81/Android_and_WebService/WebService/dbMethods/registration.php",
+        client.post("http://45.35.4.29/w/registration.php",
                 params, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                        prgDialog.cancel();
                         prgDialog.hide();
                         Toast.makeText(getApplicationContext(), Arrays.toString(responseBody), LENGTH_LONG).show();
                     }
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                        prgDialog.cancel();
+                        prgDialog.hide();
                         Toast.makeText(getApplicationContext(), "Something went wrong. Please try again later.", LENGTH_LONG).show();
                     }
                 });

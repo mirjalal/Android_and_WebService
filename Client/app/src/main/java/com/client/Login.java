@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import org.apache.http.Header;
@@ -96,14 +97,12 @@ public class Login extends ActionBarActivity {
         if (netInfo != null && netInfo.isConnectedOrConnecting()) {
             try {
                 new AsyncTask<Void, Void, String>() {
-                    //  ProgressDialog progressDialog = new ProgressDialog(Login.this);
 
                     @Override
                     protected void onPreExecute() {
                         prgDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                             public void onCancel(DialogInterface arg0) {
                                 prgDialog.cancel();
-//                                prgDialog.dismiss();
                                 prgDialog.hide();
                             }
                         });
@@ -122,8 +121,8 @@ public class Login extends ActionBarActivity {
                         prgDialog.setMessage("Getting data...");
                         prgDialog.show();
 
-                        params.put("_username", _username);
-                        params.put("_password", _password);
+                        params.add("_username", _username);
+                        params.add("_password", _password);
 
                         callService();
                     }
@@ -161,11 +160,13 @@ public class Login extends ActionBarActivity {
     private void callService() {
         AsyncHttpClient client = new AsyncHttpClient();
         // Don't forget to change the IP address to your LAN address. Port no as well.
-        client.get("http://45.35.4.29:81/Android_and_WebService/WebService/dbMethods/login.php",
-                params, new AsyncHttpResponseHandler() {
+        client.get("http://45.35.4.29/w/login.php",
+                params, new JsonHttpResponseHandler() {
                     @Override
-                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        if (!Arrays.toString(responseBody).equals("Username or password is incorrect")) {
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject responseBody) {
+                        super.onSuccess(statusCode, headers, responseBody);
+
+                        if (!(responseBody.toString().equals("Username or password is incorrect"))) {
                             int json_id;
                             String json_name;
                             String json_surname;
@@ -179,47 +180,62 @@ public class Login extends ActionBarActivity {
 
                             //parse JSON data
                             try {
-                                JSONArray jsonArray = new JSONArray(Arrays.toString(responseBody));
-                                if (jsonArray.length() != 0) {
-                                    prgDialog.setMessage("Getting data...");
-                                    prgDialog.show();
+                                Log.d("JSON result: ", responseBody.toString());
 
-                                    JSONObject jsonObject = jsonArray.getJSONObject(0);
-                                    json_id = jsonObject.getInt("_id");
-                                    json_name = jsonObject.getString("_name");
-                                    json_surname = jsonObject.getString("_surname");
-                                    json_graduated_from = jsonObject.getString("_graduated_from");
-                                    json_graduated_in = jsonObject.getString("_graduated_in");
-                                    json_born_place = jsonObject.getString("_born_place");
-                                    json_birthday = jsonObject.getString("_birthday");
-                                    json_picture = jsonObject.getString("_profile_pic");
-
-                                    Intent intent = new Intent(getBaseContext(), Profile.class);
-                                    /********** set extra values to send them to Profile activity **********/
-                                    intent.putExtra("_id", json_id);
-                                    intent.putExtra("_name", json_name);
-                                    intent.putExtra("_surname", json_surname);
-                                    intent.putExtra("_graduated_from", json_graduated_from);
-                                    intent.putExtra("_graduated_in", json_graduated_in);
-                                    intent.putExtra("_born_place", json_born_place);
-                                    intent.putExtra("_birthday", json_birthday);
-                                    intent.putExtra("_picture", json_picture);
-                                    /********** set extra values to send them to Profile activity **********/
-                                    startActivity(intent);
+//                                JSONArray jsonArray = new JSONArray(responseBody);
+//                                JSONObject jsonObject = new JSONObject(Arrays.toString(responseBody));
+                                if (responseBody.length() != 0) {
+                                    Toast.makeText(getApplicationContext(), "Logged in", LENGTH_LONG).show();
+//                                    prgDialog.setMessage("Getting data...");
+//                                    prgDialog.show();
+//
+////                                    JSONObject jsonObject = jsonArray.getJSONObject(0);
+////                                    json_id = jsonObject.getInt("_id");
+//                                    json_name = jsonObject.getString("_name");
+//                                    json_surname = jsonObject.getString("_surname");
+//                                    json_graduated_from = jsonObject.getString("_graduated_from");
+//                                    json_graduated_in = jsonObject.getString("_graduated_in");
+//                                    json_born_place = jsonObject.getString("_born_place");
+//                                    json_birthday = jsonObject.getString("_birthday");
+////                                    json_picture = jsonObject.getString("_profile_pic");
+//
+//
+//                                    Intent intent = new Intent(getBaseContext(), Profile.class);
+//                                    /********** set extra values to send them to Profile activity **********/
+////                                    intent.putExtra("_id", json_id);
+//                                    intent.putExtra("_name", json_name);
+//                                    intent.putExtra("_surname", json_surname);
+//                                    intent.putExtra("_graduated_from", json_graduated_from);
+//                                    intent.putExtra("_graduated_in", json_graduated_in);
+//                                    intent.putExtra("_born_place", json_born_place);
+//                                    intent.putExtra("_birthday", json_birthday);
+////                                    intent.putExtra("_picture", json_picture);
+//                                    /********** set extra values to send them to Profile activity **********/
+//                                    startActivity(intent);
                                 } else {
                                     Toast.makeText(getApplicationContext(), "Username or password is incorrect", LENGTH_LONG).show();
                                 }
                             } catch (Exception e) {
+                                prgDialog.cancel();
+                                prgDialog.hide();
                                 Toast.makeText(getApplicationContext(), "Something went wrong. Please try again later.", LENGTH_LONG).show();
                                 Log.w("Picture error; ", e.toString());
                             }
-                        } else
-                            Toast.makeText(getApplicationContext(), Arrays.toString(responseBody), LENGTH_LONG).show();
+                        } else {
+                            prgDialog.cancel();
+                            prgDialog.hide();
+                            Toast.makeText(getApplicationContext(), responseBody.toString(), LENGTH_LONG).show();
+                        }
                     }
 
                     @Override
-                    public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+
+                        prgDialog.cancel();
+                        prgDialog.hide();
                         Toast.makeText(getApplicationContext(), "Something went wrong. Please try again later.", LENGTH_LONG).show();
+                        Log.e("FAILURE: ", throwable.getMessage() + "\nStatus code: " + statusCode);
                     }
                 });
     }

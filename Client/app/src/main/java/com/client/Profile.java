@@ -53,14 +53,14 @@ public class Profile extends ActionBarActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            id = extras.getInt("_id");
+//            id = extras.getInt("_id");
             name_value = extras.getString("_name");
             surname_value = extras.getString("_surname");
             graduated_from_value = extras.getString("_graduated_from");
             graduated_in_value = extras.getString("_graduated_in");
             born_place_value = extras.getString("_born_place");
             birthday_value = extras.getString("_birthday");
-            profile_pic_value = extras.getString("_picture");
+//            profile_pic_value = extras.getString("_picture");
 
             /***************** set values to view elements ******************/
             name.setText(name_value.trim());
@@ -71,14 +71,14 @@ public class Profile extends ActionBarActivity {
             birthday.setText(birthday_value.trim());
 
 
-            byte[] decodedByte = Base64.decode(profile_pic_value, Base64.DEFAULT);
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = false;
-            options.inPreferredConfig = Bitmap.Config.RGB_565;
-//            return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length, options);
-//            byte[] decodedString = Base64.decode(profile_pic_value, Base64.DEFAULT);
-            Bitmap bmp = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length, options);
-            _picture.setImageBitmap(bmp);
+//            byte[] decodedByte = Base64.decode(profile_pic_value, Base64.DEFAULT);
+//            final BitmapFactory.Options options = new BitmapFactory.Options();
+//            options.inJustDecodeBounds = false;
+//            options.inPreferredConfig = Bitmap.Config.RGB_565;
+////            return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length, options);
+////            byte[] decodedString = Base64.decode(profile_pic_value, Base64.DEFAULT);
+//            Bitmap bmp = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length, options);
+//            _picture.setImageBitmap(bmp);
             /***************** set values to view elements ******************/
         }
 

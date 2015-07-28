@@ -12,15 +12,15 @@ try {
         $_id = 0;
         $collectedResult = array();
 
-        $_username = isset($_REQUEST['_username']) ? $_REQUEST['_username'] : 'k';
-        $_password = isset($_REQUEST['_password']) ? $_REQUEST['_password'] : 'k';
+        $_username = isset($_REQUEST['_username']) ? $_REQUEST['_username'] : '1';
+        $_password = isset($_REQUEST['_password']) ? $_REQUEST['_password'] : '2';
 
         $select = "SELECT _id FROM users WHERE _username = '{$_username}' AND _password = '{$_password}'";
         foreach ($connect->query($select) as $result)
             $_id = $result[0];
 
         if ($_id > 0) {
-            $user_data = "SELECT _id,_name,_surname,_graduated_from,_graduated_in,_born_place,_birthday,_profile_pic FROM users WHERE _id = {$_id}";
+            $user_data = "SELECT _name,_surname,_graduated_from,_graduated_in,_born_place,_birthday FROM users WHERE _id = {$_id}";
 
             $data = $connect->query($user_data);
             while ($row = $data->fetch(\PDO::FETCH_ASSOC)) {
