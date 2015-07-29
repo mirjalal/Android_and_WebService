@@ -2,18 +2,14 @@ package com.client;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
-import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.loopj.android.image.SmartImageView;
@@ -70,7 +66,7 @@ public class Profile extends ActionBarActivity {
             graduated_in.setText(graduated_in_value.trim());
             born_place.setText(born_place_value.trim());
             birthday.setText(birthday_value.trim());
-            _profile_pic.setImageUrl("http://dailydropcap.com/images/H-11.jpg");
+            _profile_pic.setImageUrl("http://45.35.4.29/w/uploads/" + profile_pic);
         }
 
         // set calendar to current date
@@ -80,6 +76,7 @@ public class Profile extends ActionBarActivity {
         il = calendar.get(Calendar.YEAR);
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
     }
+
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -114,6 +111,7 @@ public class Profile extends ActionBarActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+
     @Override
     public void onBackPressed() {
         // This will be called either automatically for you on 2.0
@@ -122,12 +120,14 @@ public class Profile extends ActionBarActivity {
         return;
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_profile, menu);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -66,18 +66,6 @@ public class Registration extends ActionBarActivity {
     Bitmap bitmap;
 
 
-    private DatePickerDialog.OnDateSetListener datepickerlistener = new DatePickerDialog.OnDateSetListener() {
-        @Override
-        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            il = year;
-            ay = monthOfYear + 1;
-            gun = dayOfMonth;
-
-            birthday.setText(gun + "." + ay + "." + il);
-        }
-    };
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,9 +114,9 @@ public class Registration extends ActionBarActivity {
                         else
                             _birthday = birthday.getText().toString();
 
-//                        if (_username.equals("") || _password.equals(""))
-//                            Toast.makeText(getApplicationContext(), "Username and password required.", LENGTH_LONG).show();
-//                        else {
+                        if (username.getText().toString().equals("") || password.getText().toString().equals(""))
+                            Toast.makeText(getApplicationContext(), "Username and password required.", LENGTH_LONG).show();
+                        else {
                             _username = username.getText().toString().trim();
                             _password = password.getText().toString(); // don't trim this value; user should be enter whitespace as password
 
@@ -136,7 +124,7 @@ public class Registration extends ActionBarActivity {
                                 postData();
                             } else {
                                 Toast.makeText(getApplicationContext(), "You must select image from gallery before you try to upload", LENGTH_LONG).show();
-//                            }
+                            }
                         }
 
                         break;
@@ -159,6 +147,7 @@ public class Registration extends ActionBarActivity {
         birthday.setOnClickListener(button_click);
         pick_image.setOnClickListener(button_click);
     }
+
 
     private void postData() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -218,12 +207,14 @@ public class Registration extends ActionBarActivity {
             Toast.makeText(getApplicationContext(), "Device is not connected to network", LENGTH_LONG).show();
     }
 
+
     // Make Http call to upload Image to Php server
     public void makeHTTPCall() {
         prgDialog.setMessage("Collecting data...");
+        prgDialog.show();
+
         AsyncHttpClient client = new AsyncHttpClient();
-        // Don't forget to change the IP address to your LAN address. Port no as well.
-        client.post("http://45.35.4.29/w/registration.php",
+        client.post("http://45.35.4.29/w/register.php",
                 params, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -251,6 +242,17 @@ public class Registration extends ActionBarActivity {
         return null;
     }
 
+
+    private DatePickerDialog.OnDateSetListener datepickerlistener = new DatePickerDialog.OnDateSetListener() {
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+            il = year;
+            ay = monthOfYear + 1;
+            gun = dayOfMonth;
+
+            birthday.setText(gun + "." + ay + "." + il);
+        }
+    };
 
     // clear form
     void clearForm(ViewGroup group) {

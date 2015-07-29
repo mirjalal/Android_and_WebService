@@ -159,7 +159,6 @@ public class Login extends ActionBarActivity {
 
     private void callService() {
         AsyncHttpClient client = new AsyncHttpClient();
-        // Don't forget to change the IP address to your LAN address. Port no as well.
         client.get("http://45.35.4.29/w/login.php",
                 params, new JsonHttpResponseHandler() {
                     @Override
@@ -176,14 +175,13 @@ public class Login extends ActionBarActivity {
 
                             //          Toast.makeText(getApplicationContext(), response, LENGTH_LONG).show();
 
-                            //parse JSON data
+                            // parse JSON data
                             try {
                                 prgDialog.cancel();
                                 prgDialog.hide();
 
-                                Log.d("JSON result: ", String.valueOf(responseBody));
+//                                Log.d("JSON result: ", String.valueOf(responseBody));
 
-                                Toast.makeText(getApplicationContext(), "Logged in", LENGTH_LONG).show();
                                 if (responseBody.length() != 0) {
                                     prgDialog.setMessage("Getting data...");
                                     prgDialog.show();
@@ -195,11 +193,11 @@ public class Login extends ActionBarActivity {
                                     json_graduated_in = jsonObject.getString("_graduated_in");
                                     json_born_place = jsonObject.getString("_born_place");
                                     json_birthday = jsonObject.getString("_birthday");
-//                                    json_picture = jsonObject.getString("_profile_pic");
+                                    json_picture = jsonObject.getString("_profile_pic");
 
 
                                     Intent intent = new Intent(getBaseContext(), Profile.class);
-                                    /********** set extra values to send them to Profile activity **********/
+                                    // set extra values to send them to Profile activity
 //                                    intent.putExtra("_id", json_id);
                                     intent.putExtra("_name", json_name);
                                     intent.putExtra("_surname", json_surname);
@@ -207,8 +205,7 @@ public class Login extends ActionBarActivity {
                                     intent.putExtra("_graduated_in", json_graduated_in);
                                     intent.putExtra("_born_place", json_born_place);
                                     intent.putExtra("_birthday", json_birthday);
-//                                    intent.putExtra("_picture", json_picture);
-                                    /********** set extra values to send them to Profile activity **********/
+                                    intent.putExtra("_picture", json_picture);
                                     startActivity(intent);
                                 } else {
                                     Toast.makeText(getApplicationContext(), "Username or password is incorrect", LENGTH_LONG).show();
